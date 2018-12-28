@@ -35,7 +35,8 @@ public:
     QLabel *label;
     QLabel *label_2;
     QPushButton *pushButton_Start;
-    QPushButton *pushButton_Stop;
+    QPushButton *pushButton_Manual;
+    QPushButton *pushButton_Save;
     QToolBar *mainToolBar;
     QStatusBar *statusBar;
     QMenuBar *menuBar;
@@ -44,7 +45,8 @@ public:
     {
         if (AutoCopyClass->objectName().isEmpty())
             AutoCopyClass->setObjectName(QStringLiteral("AutoCopyClass"));
-        AutoCopyClass->resize(600, 270);
+        AutoCopyClass->resize(605, 270);
+        AutoCopyClass->setIconSize(QSize(24, 24));
         AutoCopyClass->setAnimated(true);
         centralWidget = new QWidget(AutoCopyClass);
         centralWidget->setObjectName(QStringLiteral("centralWidget"));
@@ -65,10 +67,13 @@ public:
         label_2->setGeometry(QRect(10, 110, 54, 12));
         pushButton_Start = new QPushButton(centralWidget);
         pushButton_Start->setObjectName(QStringLiteral("pushButton_Start"));
-        pushButton_Start->setGeometry(QRect(510, 80, 75, 23));
-        pushButton_Stop = new QPushButton(centralWidget);
-        pushButton_Stop->setObjectName(QStringLiteral("pushButton_Stop"));
-        pushButton_Stop->setGeometry(QRect(510, 120, 75, 23));
+        pushButton_Start->setGeometry(QRect(510, 80, 75, 30));
+        pushButton_Manual = new QPushButton(centralWidget);
+        pushButton_Manual->setObjectName(QStringLiteral("pushButton_Manual"));
+        pushButton_Manual->setGeometry(QRect(510, 130, 75, 40));
+        pushButton_Save = new QPushButton(centralWidget);
+        pushButton_Save->setObjectName(QStringLiteral("pushButton_Save"));
+        pushButton_Save->setGeometry(QRect(310, 102, 75, 25));
         AutoCopyClass->setCentralWidget(centralWidget);
         mainToolBar = new QToolBar(AutoCopyClass);
         mainToolBar->setObjectName(QStringLiteral("mainToolBar"));
@@ -78,7 +83,7 @@ public:
         AutoCopyClass->setStatusBar(statusBar);
         menuBar = new QMenuBar(AutoCopyClass);
         menuBar->setObjectName(QStringLiteral("menuBar"));
-        menuBar->setGeometry(QRect(0, 0, 600, 23));
+        menuBar->setGeometry(QRect(0, 0, 605, 23));
         AutoCopyClass->setMenuBar(menuBar);
 
         retranslateUi(AutoCopyClass);
@@ -98,16 +103,18 @@ public:
 "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
 "p, li { white-space: pre-wrap; }\n"
 "</style></head><body style=\" font-family:'SimSun'; font-size:9pt; font-weight:400; font-style:normal;\">\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">G:\\\345\267\245\345\205\267\\SEMICO\\797_single_12M_05_PR_[FP]_0724\\Data</p></body></html>", Q_NULLPTR));
+"<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><br /></p></body></html>", Q_NULLPTR));
         to->setHtml(QApplication::translate("AutoCopyClass", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
 "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
 "p, li { white-space: pre-wrap; }\n"
 "</style></head><body style=\" font-family:'SimSun'; font-size:9pt; font-weight:400; font-style:normal;\">\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">C:\\data</p></body></html>", Q_NULLPTR));
+"<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><br /></p></body></html>", Q_NULLPTR));
         label->setText(QApplication::translate("AutoCopyClass", "From:", Q_NULLPTR));
         label_2->setText(QApplication::translate("AutoCopyClass", "To:", Q_NULLPTR));
-        pushButton_Start->setText(QApplication::translate("AutoCopyClass", "PushButton", Q_NULLPTR));
-        pushButton_Stop->setText(QApplication::translate("AutoCopyClass", "PushButton", Q_NULLPTR));
+        pushButton_Start->setText(QApplication::translate("AutoCopyClass", "Stop", Q_NULLPTR));
+        pushButton_Manual->setText(QApplication::translate("AutoCopyClass", "Manual\n"
+"Upload", Q_NULLPTR));
+        pushButton_Save->setText(QApplication::translate("AutoCopyClass", "Save", Q_NULLPTR));
     } // retranslateUi
 
 };

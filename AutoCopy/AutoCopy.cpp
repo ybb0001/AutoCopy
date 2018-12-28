@@ -16,6 +16,7 @@
 using namespace std;
 
 bool start = true;
+bool manual = false;
 int mode = 1;
 string skip_Words[5];
 string src, dst, setting;
@@ -109,36 +110,69 @@ bool File_Name_Compare( string file) {
 }
 
 
+void upload() {
 
+	get_Setting();
+	vector<string> files = getFiles(src + "*");
+	vector<string> ::iterator iVector = files.begin();
+	while (iVector != files.end())
+	{
+		string s = src + *iVector;
+		string d = dst + *iVector;
+
+		if (mode == 2 || !File_Name_Compare(*iVector))
+			CopyFile(CA2CT(s.c_str()), CA2CT(d.c_str()), true);
+
+		++iVector;
+	}
+
+}
 
 DWORD WINAPI myThread(LPVOID argv) {
 
 	char buff[10];
 	ZeroMemory(buff, sizeof(buff));
 	memcpy(buff, argv, 10);
+	bool work = true;
 
-	while (start) {
+	while (1) {
 
-		QTime ct = QTime::currentTime();
-		if (ct.hour > 7 && ct.hour > 8) {
+		if (start){
 
-			get_Setting();
-			vector<string> files = getFiles(src + "*");
+				QTime t1, t2;
+			//	t1.fromString("7:07:50", "hh:mm:ss");
+			//	t2.fromString("8:07:50", "hh:mm:ss");
 
-			vector<string> ::iterator iVector = files.begin();
-			while (iVector != files.end())
-			{
-				string s = src + *iVector;
-				string d = dst + *iVector;
+			QTime ct = QTime::currentTime();
 
-				if (mode == 2 || !File_Name_Compare(*iVector))
-					CopyFile(CA2CT(s.c_str()), CA2CT(d.c_str()), true);
+			int hour_now = ct.hour();
 
-				++iVector;
+			if (work && (hour_now >= 0 && hour_now < 1 && work)) {
+
+				/*	get_Setting();
+					vector<string> files = getFiles(src + "*");
+
+					vector<string> ::iterator iVector = files.begin();
+					while (iVector != files.end())
+					{
+						string s = src + *iVector;
+						string d = dst + *iVector;
+
+						if (mode == 2 || !File_Name_Compare(*iVector))
+							CopyFile(CA2CT(s.c_str()), CA2CT(d.c_str()), true);
+
+						++iVector;
+					}*/
+				upload();
+				work = false;
+			}
+
+			if (hour_now >= 8) {
+				work = true;
 			}
 		}
 
-		Sleep(30000);
+		Sleep(10000);
 		if (mode == 9)
 			start = false;
 	}
@@ -149,19 +183,37 @@ DWORD WINAPI myThread(LPVOID argv) {
 
 void AutoCopy::on_pushButton_Start_clicked() {
 
-	start = true;
-	string s = "1";
-	HANDLE myHandle = CreateThread(NULL, 0, myThread, (LPVOID)s.c_str(), 0, NULL);
+	if (start) {
+		start = false;
+		ui->pushButton_Start->setText("Start");
+	}
+	else {
+		start = true;
+		ui->pushButton_Start->setText("Stop");
+		
+	}
+}
+
+
+void AutoCopy::on_pushButton_Manual_clicked() {
+
+	upload();
 
 }
 
 
-void AutoCopy::on_pushButton_Stop_clicked() {
+void AutoCopy::on_pushButton_Save_clicked() {
 
-	start = false;
+	src = ui->from->document()->toPlainText().toLocal8Bit().toStdString();
+	dst = ui->to->document()->toPlainText().toLocal8Bit().toStdString();
+
+	WritePrivateProfileString(TEXT("Path"), TEXT("from"), CA2CT(src.c_str()), TEXT(".\\Setting\\Path.ini"));
+	WritePrivateProfileString(TEXT("Path"), TEXT("to"), CA2CT(dst.c_str()), TEXT(".\\Setting\\Path.ini"));
+
+	src += "\\";
+	dst += "\\";
 
 }
-
 
 
 void AutoCopy::on_pushButton_Minimize_clicked() {
@@ -186,37 +238,21 @@ void AutoCopy::on_pushButton_Minimize_clicked() {
 	//在系统托盘显示此对象
 	mSysTrayIcon->show();
 
-	src = ui->from->document()->toPlainText().toLocal8Bit().toStdString();
-	dst = ui->to->document()->toPlainText().toLocal8Bit().toStdString();
+	TCHAR lpTexts[200];
+	GetPrivateProfileString(TEXT("Path"), TEXT("from"), TEXT(""), lpTexts, 200, TEXT(".\\Setting\\Path.ini"));
+	src = CT2A(lpTexts);
+	GetPrivateProfileString(TEXT("Path"), TEXT("to"), TEXT(""), lpTexts, 200, TEXT(".\\Setting\\Path.ini"));
+	dst = CT2A(lpTexts);
+
+	ui->from->setText(src.c_str());
+	ui->to->setText(dst.c_str());
+	
 	src += "\\";
 	dst += "\\";
 	setting = dst + "copy_set.int";
-//	Lsetting = CA2CT(setting.c_str());
 
-	on_pushButton_Start_clicked();
-
-	//while (start) {
-
-	//	get_Setting();
-	//	vector<string> files = getFiles(src+"*");
-
-	//	vector<string> ::iterator iVector = files.begin();
-	//	while (iVector != files.end())
-	//	{
-	//		string s = src + *iVector;
-	//		string d = dst + *iVector;
-
-	//		if(mode==2|| !File_Name_Compare(*iVector))
-	//			CopyFile(CA2CT(s.c_str()), CA2CT(d.c_str()),true);
-	//	
-	//		++iVector;
-	//	}
-
-
-	//	Sleep(30000);
-	//	if(mode==9)
-	//		start = false;
-	//}
+	string s = "1";
+	HANDLE myHandle = CreateThread(NULL, 0, myThread, (LPVOID)s.c_str(), 0, NULL);
 
 }
 
@@ -245,7 +281,6 @@ void AutoCopy::createActions()
 
 	mExitAppAction = new QAction(QObject::trUtf8("退出"), this);
 	connect(mExitAppAction, SIGNAL(triggered()), this, SLOT(on_exitAppAction()));
-
 }
 
 void AutoCopy::createMenu()

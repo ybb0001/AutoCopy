@@ -33,7 +33,9 @@ private slots:
 	void on_showMainAction();
 	void on_exitAppAction();
 	void on_pushButton_Start_clicked();
-	void on_pushButton_Stop_clicked();
+	void on_pushButton_Manual_clicked();
+	void on_pushButton_Save_clicked();
+
 
 
 private:
