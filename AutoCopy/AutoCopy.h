@@ -17,10 +17,10 @@ public:
 
 
 public:
-	QSystemTrayIcon *mSysTrayIcon;
-	QMenu *mMenu;
-	QAction *mShowMainAction;
-	QAction *mExitAppAction;
+	QSystemTrayIcon *mSysTrayIcon = 0;
+	QMenu *mMenu = NULL;;
+	QAction *mShowMainAction = NULL;;
+	QAction *mExitAppAction = NULL;;
 
 public:
 	void createActions();

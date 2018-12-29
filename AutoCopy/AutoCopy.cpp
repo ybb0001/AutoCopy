@@ -1,7 +1,5 @@
 #include "AutoCopy.h"
 #include "ui_AutoCopy.h"
-//#include <Windows.h>
-
 #include <iostream>
 #include <stdlib.h>
 #include <stdio.h>
@@ -18,29 +16,15 @@ using namespace std;
 bool start = true;
 bool manual = false;
 int mode = 1;
-string skip_Words[5];
-string src, dst, setting;
-LPCWSTR Lsetting;
-
-AutoCopy::AutoCopy(QWidget *parent)
-	: QMainWindow(parent)
-{
-	ui->setupUi(this);
-
-	on_pushButton_Minimize_clicked();
-
-}
-
-AutoCopy:: ~AutoCopy()
-{
-	delete ui;
-}
-
+string skip_Words[5] = {""};
+string src="", dst="", setting="";
+LPCWSTR Lsetting=TEXT("");
+/*
 vector<string> getFiles(string cate_dir)
 {
 	vector<string> files;//存放文件名
 	_finddata_t file;
-	long lf;
+	long lf = 0;
 	//输入文件夹路径
 	if ((lf = _findfirst(cate_dir.c_str(), &file)) == -1) {
 		cout << cate_dir << " not found!!!" << endl;
@@ -61,10 +45,9 @@ vector<string> getFiles(string cate_dir)
 	return files;
 }
 
-
 void get_Setting() {
 
-	int mode = GetPrivateProfileInt(_T("Copy_Setting"), TEXT("mode"), 0, CA2CT(setting.c_str()));
+	mode = GetPrivateProfileInt(_T("Copy_Setting"), TEXT("mode"), 0, CA2CT(setting.c_str()));
 
 	TCHAR lpTexts[13];
 	GetPrivateProfileString(TEXT("Copy_Setting"), TEXT("skip_filename_Words_1"), TEXT(""), lpTexts, 12, CA2CT(setting.c_str()));
@@ -80,35 +63,24 @@ void get_Setting() {
 
 }
 
-
-bool File_Name_Compare( string file) {
+bool File_Name_Compare(string file) {
 
 	for (int k = 0; k < 5; k++) {
-
 		if (skip_Words[k].length()>2) {
-
 			for (int i = 0; i < file.length(); i++) {
-
 				if (file[i] == skip_Words[k][0]) {
-
 					int e = 0;
 					while (e < skip_Words[k].length() && file[i + e] == skip_Words[k][e]) {
 						e++;
-
 					}
 					if (e == skip_Words[k].length())
-						return true;		
-
+						return true;
 				}
-
 			}
-
 		}
-
 	}
 	return false;
 }
-
 
 void upload() {
 
@@ -128,6 +100,7 @@ void upload() {
 
 }
 
+
 DWORD WINAPI myThread(LPVOID argv) {
 
 	char buff[10];
@@ -136,35 +109,18 @@ DWORD WINAPI myThread(LPVOID argv) {
 	bool work = true;
 
 	while (1) {
-
-		if (start){
-
-				QTime t1, t2;
-			//	t1.fromString("7:07:50", "hh:mm:ss");
-			//	t2.fromString("8:07:50", "hh:mm:ss");
-
+		if (start) {
+			get_Setting();
 			QTime ct = QTime::currentTime();
-
 			int hour_now = ct.hour();
-
-			if (work && (hour_now >= 0 && hour_now < 1 && work)) {
-
-				/*	get_Setting();
-					vector<string> files = getFiles(src + "*");
-
-					vector<string> ::iterator iVector = files.begin();
-					while (iVector != files.end())
-					{
-						string s = src + *iVector;
-						string d = dst + *iVector;
-
-						if (mode == 2 || !File_Name_Compare(*iVector))
-							CopyFile(CA2CT(s.c_str()), CA2CT(d.c_str()), true);
-
-						++iVector;
-					}*/
+			if (work && (hour_now >= 7 && hour_now < 8)) {
 				upload();
 				work = false;
+			}
+
+			if (mode > 2) {
+				upload();
+				WritePrivateProfileString(TEXT("Copy_Setting"), TEXT("mode"), TEXT("1"), CA2CT(setting.c_str()));
 			}
 
 			if (hour_now >= 8) {
@@ -173,12 +129,45 @@ DWORD WINAPI myThread(LPVOID argv) {
 		}
 
 		Sleep(10000);
-		if (mode == 9)
+		if (mode == -1)
 			start = false;
 	}
 
 	return NULL;
 }
+
+*/
+AutoCopy::AutoCopy(QWidget *parent)
+	: QMainWindow(parent)
+{
+	ui->setupUi(this);
+
+	TCHAR lpTexts[200];
+	GetPrivateProfileString(TEXT("Path"), TEXT("from"), TEXT(""), lpTexts, 200, TEXT(".\\Setting\\Path.ini"));
+	src = CT2A(lpTexts);
+	GetPrivateProfileString(TEXT("Path"), TEXT("to"), TEXT(""), lpTexts, 200, TEXT(".\\Setting\\Path.ini"));
+	dst = CT2A(lpTexts);
+
+	ui->from->setText(src.c_str());
+	ui->to->setText(dst.c_str());
+
+	src += "\\";
+	dst += "\\";
+	setting = dst + "copy_set.int";
+
+	on_pushButton_Minimize_clicked();
+	string s = "1";
+//	HANDLE myHandle = CreateThread(NULL, 0, myThread, (LPVOID)s.c_str(), 0, NULL);
+
+}
+
+
+AutoCopy:: ~AutoCopy()
+{
+	delete ui;
+}
+
+
 
 
 void AutoCopy::on_pushButton_Start_clicked() {
@@ -197,7 +186,7 @@ void AutoCopy::on_pushButton_Start_clicked() {
 
 void AutoCopy::on_pushButton_Manual_clicked() {
 
-	upload();
+//	upload();
 
 }
 
@@ -218,42 +207,27 @@ void AutoCopy::on_pushButton_Save_clicked() {
 
 void AutoCopy::on_pushButton_Minimize_clicked() {
 
-	//隐藏程序主窗口
-	this->hide();
-	//新建QSystemTrayIcon对象
-	mSysTrayIcon = new QSystemTrayIcon(this);
-	//新建托盘要显示的icon
-	QIcon icon = QIcon("icon.png");
-	//将icon设到QSystemTrayIcon对象中
-	mSysTrayIcon->setIcon(icon);
-	//当鼠标移动到托盘上的图标时，会显示此处设置的内容
-	mSysTrayIcon->setToolTip(QObject::trUtf8("Sensor2005 Data AutoUpdate"));
+		//隐藏程序主窗口
+		this->hide();
 
-	//给QSystemTrayIcon添加槽函数
-	connect(mSysTrayIcon, SIGNAL(activated(QSystemTrayIcon::ActivationReason)), this, SLOT(on_activatedSysTrayIcon(QSystemTrayIcon::ActivationReason)));
+		//新建QSystemTrayIcon对象
+		mSysTrayIcon = new QSystemTrayIcon(this);
+		//新建托盘要显示的icon
+		QIcon icon = QIcon("icon.png");
+		//将icon设到QSystemTrayIcon对象中
+		mSysTrayIcon->setIcon(icon);
+		//当鼠标移动到托盘上的图标时，会显示此处设置的内容
+		mSysTrayIcon->setToolTip(QObject::trUtf8("Sensor2005 Data AutoUpdate"));
 
-	//建立托盘操作的菜单
-	createActions();
-	createMenu();
-	//在系统托盘显示此对象
-	mSysTrayIcon->show();
+		//给QSystemTrayIcon添加槽函数
+		connect(mSysTrayIcon, SIGNAL(activated(QSystemTrayIcon::ActivationReason)), this, SLOT(on_activatedSysTrayIcon(QSystemTrayIcon::ActivationReason)));
 
-	TCHAR lpTexts[200];
-	GetPrivateProfileString(TEXT("Path"), TEXT("from"), TEXT(""), lpTexts, 200, TEXT(".\\Setting\\Path.ini"));
-	src = CT2A(lpTexts);
-	GetPrivateProfileString(TEXT("Path"), TEXT("to"), TEXT(""), lpTexts, 200, TEXT(".\\Setting\\Path.ini"));
-	dst = CT2A(lpTexts);
-
-	ui->from->setText(src.c_str());
-	ui->to->setText(dst.c_str());
+		//建立托盘操作的菜单
+		createActions();
+		createMenu();
+		//在系统托盘显示此对象
+		mSysTrayIcon->show();
 	
-	src += "\\";
-	dst += "\\";
-	setting = dst + "copy_set.int";
-
-	string s = "1";
-	HANDLE myHandle = CreateThread(NULL, 0, myThread, (LPVOID)s.c_str(), 0, NULL);
-
 }
 
 
