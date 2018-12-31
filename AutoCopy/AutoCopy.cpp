@@ -19,7 +19,8 @@ int mode = 1;
 string skip_Words[5] = {""};
 string src="", dst="", setting="";
 LPCWSTR Lsetting=TEXT("");
-/*
+HANDLE myHandle;
+
 vector<string> getFiles(string cate_dir)
 {
 	vector<string> files;//存放文件名
@@ -136,7 +137,7 @@ DWORD WINAPI myThread(LPVOID argv) {
 	return NULL;
 }
 
-*/
+
 AutoCopy::AutoCopy(QWidget *parent)
 	: QMainWindow(parent)
 {
@@ -157,17 +158,17 @@ AutoCopy::AutoCopy(QWidget *parent)
 
 	on_pushButton_Minimize_clicked();
 	string s = "1";
-//	HANDLE myHandle = CreateThread(NULL, 0, myThread, (LPVOID)s.c_str(), 0, NULL);
+	myHandle = CreateThread(NULL, 0, myThread, (LPVOID)s.c_str(), 0, NULL);
 
 }
 
 
 AutoCopy:: ~AutoCopy()
 {
+
+	TerminateProcess(myHandle, 4);
 	delete ui;
 }
-
-
 
 
 void AutoCopy::on_pushButton_Start_clicked() {
@@ -186,7 +187,7 @@ void AutoCopy::on_pushButton_Start_clicked() {
 
 void AutoCopy::on_pushButton_Manual_clicked() {
 
-//	upload();
+	upload();
 
 }
 
