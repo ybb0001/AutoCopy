@@ -1,0 +1,1 @@
+Uic'ing AutoCopy.ui...;G:\Plug_in\QT\5.8\msvc2015\bin\uic.exe;"G:\Visual Studio 2015\Projects\AutoCopy\AutoCopy\AutoCopy.ui" -o ".\GeneratedFiles\ui_AutoCopy.h"

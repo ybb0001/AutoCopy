@@ -36,15 +36,9 @@
     <ClCompile Include="AutoCopy.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="mythread.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="AutoCopy.h">
-      <Filter>Header Files</Filter>
-    </QtMoc>
-    <QtMoc Include="mythread.h">
       <Filter>Header Files</Filter>
     </QtMoc>
   </ItemGroup>
@@ -59,13 +53,13 @@
     </QtRcc>
   </ItemGroup>
   <ItemGroup>
-    <Image Include="icon.png">
-      <Filter>Resource Files</Filter>
-    </Image>
-  </ItemGroup>
-  <ItemGroup>
     <ClInclude Include="GeneratedFiles\ui_AutoCopy.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="icon.png">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
 </Project>

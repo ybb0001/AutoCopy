@@ -1,5 +1,4 @@
 #include "AutoCopy.h"
-#include "ui_AutoCopy.h"
 #include <iostream>
 #include <stdlib.h>
 #include <stdio.h>
@@ -11,15 +10,18 @@
 #include <fstream>
 #include <qdatetime.h>
 
+
 using namespace std;
 
 bool start = true;
 bool manual = false;
 int mode = 1;
-string skip_Words[5] = {""};
-string src="", dst="", setting="";
-LPCWSTR Lsetting=TEXT("");
+int copy_hour = 0, copy_minute = 0;
+string skip_Words[5] = { "" };
+string src = "", dst = "", setting = "";
+LPCWSTR Lsetting = TEXT("");
 HANDLE myHandle;
+
 
 vector<string> getFiles(string cate_dir)
 {
@@ -88,17 +90,18 @@ void upload() {
 	get_Setting();
 	vector<string> files = getFiles(src + "*");
 	vector<string> ::iterator iVector = files.begin();
-	while (iVector != files.end())
-	{
-		string s = src + *iVector;
-		string d = dst + *iVector;
+	if (mode > 0){
+		while (iVector != files.end())
+		{
+			string s = src + *iVector;
+			string d = dst + *iVector;
 
-		if (mode == 2 || !File_Name_Compare(*iVector))
-			CopyFile(CA2CT(s.c_str()), CA2CT(d.c_str()), true);
+			if (mode == 2 || !File_Name_Compare(*iVector))
+				CopyFile(CA2CT(s.c_str()), CA2CT(d.c_str()), true);
 
-		++iVector;
+			++iVector;
+		}	
 	}
-
 }
 
 
@@ -111,25 +114,26 @@ DWORD WINAPI myThread(LPVOID argv) {
 
 	while (1) {
 		if (start) {
-			get_Setting();
+		//	get_Setting();
 			QTime ct = QTime::currentTime();
 			int hour_now = ct.hour();
-			if (work && (hour_now >= 7 && hour_now < 8)) {
+			int minute_now = ct.minute();
+			if (work && (hour_now >= copy_hour && minute_now > copy_minute)) {
 				upload();
 				work = false;
 			}
 
 			if (mode > 2) {
 				upload();
-				WritePrivateProfileString(TEXT("Copy_Setting"), TEXT("mode"), TEXT("1"), CA2CT(setting.c_str()));
+				WritePrivateProfileString(TEXT(".\\Setting\\Copy_Setting"), TEXT("mode"), TEXT("1"), CA2CT(setting.c_str()));
 			}
 
-			if (hour_now >= 8) {
+			if (!work && hour_now >= copy_hour+1) {
 				work = true;
 			}
 		}
 
-		Sleep(10000);
+		Sleep(300000);
 		if (mode == -1)
 			start = false;
 	}
@@ -138,19 +142,26 @@ DWORD WINAPI myThread(LPVOID argv) {
 }
 
 
-AutoCopy::AutoCopy(QWidget *parent)
-	: QMainWindow(parent)
+AutoCopy::AutoCopy(QWidget *parent): 
+	QWidget(parent),
+	ui(new Ui::mQWidget)
 {
+
 	ui->setupUi(this);
 
 	TCHAR lpTexts[200];
-	GetPrivateProfileString(TEXT("Path"), TEXT("from"), TEXT(""), lpTexts, 200, TEXT(".\\Setting\\Path.ini"));
+	GetPrivateProfileString(TEXT("Path"), TEXT("from"), TEXT(""), lpTexts, 200, TEXT(".\\Setting\\Setting.ini"));
 	src = CT2A(lpTexts);
-	GetPrivateProfileString(TEXT("Path"), TEXT("to"), TEXT(""), lpTexts, 200, TEXT(".\\Setting\\Path.ini"));
+	GetPrivateProfileString(TEXT("Path"), TEXT("to"), TEXT(""), lpTexts, 200, TEXT(".\\Setting\\Setting.ini"));
 	dst = CT2A(lpTexts);
+
+	copy_hour = GetPrivateProfileInt(_T("Time"), TEXT("hour"), 0, TEXT(".\\Setting\\Setting.ini"));
+	copy_minute = GetPrivateProfileInt(_T("Time"), TEXT("minute"), 0, TEXT(".\\Setting\\Setting.ini"));
 
 	ui->from->setText(src.c_str());
 	ui->to->setText(dst.c_str());
+	ui->hour->setText(QString::number(copy_hour,10));
+	ui->minute->setText(QString::number(copy_minute, 10));
 
 	src += "\\";
 	dst += "\\";
@@ -180,7 +191,7 @@ void AutoCopy::on_pushButton_Start_clicked() {
 	else {
 		start = true;
 		ui->pushButton_Start->setText("Stop");
-		
+
 	}
 }
 
@@ -197,8 +208,18 @@ void AutoCopy::on_pushButton_Save_clicked() {
 	src = ui->from->document()->toPlainText().toLocal8Bit().toStdString();
 	dst = ui->to->document()->toPlainText().toLocal8Bit().toStdString();
 
-	WritePrivateProfileString(TEXT("Path"), TEXT("from"), CA2CT(src.c_str()), TEXT(".\\Setting\\Path.ini"));
-	WritePrivateProfileString(TEXT("Path"), TEXT("to"), CA2CT(dst.c_str()), TEXT(".\\Setting\\Path.ini"));
+	string str_hour = ui->hour->document()->toPlainText().toLocal8Bit().toStdString();
+	string str_minute = ui->minute->document()->toPlainText().toLocal8Bit().toStdString();
+
+	copy_hour = ui->hour->document()->toPlainText().toInt();
+	copy_minute = ui->minute->document()->toPlainText().toInt();
+
+	WritePrivateProfileString(TEXT("Path"), TEXT("from"), CA2CT(src.c_str()), TEXT(".\\Setting\\Setting.ini"));
+	WritePrivateProfileString(TEXT("Path"), TEXT("to"), CA2CT(dst.c_str()), TEXT(".\\Setting\\Setting.ini"));
+
+	WritePrivateProfileString(TEXT("Time"), TEXT("hour"), CA2CT(str_hour.c_str()), TEXT(".\\Setting\\Setting.ini"));
+	WritePrivateProfileString(TEXT("Time"), TEXT("minute"), CA2CT(str_minute.c_str()), TEXT(".\\Setting\\Setting.ini"));
+
 
 	src += "\\";
 	dst += "\\";
@@ -208,27 +229,27 @@ void AutoCopy::on_pushButton_Save_clicked() {
 
 void AutoCopy::on_pushButton_Minimize_clicked() {
 
-		//隐藏程序主窗口
-		this->hide();
+	//隐藏程序主窗口
+	this->hide();
 
-		//新建QSystemTrayIcon对象
-		mSysTrayIcon = new QSystemTrayIcon(this);
-		//新建托盘要显示的icon
-		QIcon icon = QIcon("icon.png");
-		//将icon设到QSystemTrayIcon对象中
-		mSysTrayIcon->setIcon(icon);
-		//当鼠标移动到托盘上的图标时，会显示此处设置的内容
-		mSysTrayIcon->setToolTip(QObject::trUtf8("Sensor2005 Data AutoUpdate"));
+	//新建QSystemTrayIcon对象
+	mSysTrayIcon = new QSystemTrayIcon(this);
+	//新建托盘要显示的icon
+	QIcon icon = QIcon("icon.png");
+	//将icon设到QSystemTrayIcon对象中
+	mSysTrayIcon->setIcon(icon);
+	//当鼠标移动到托盘上的图标时，会显示此处设置的内容
+	mSysTrayIcon->setToolTip(QObject::trUtf8("Sensor2005 Data AutoLoader"));
 
-		//给QSystemTrayIcon添加槽函数
-		connect(mSysTrayIcon, SIGNAL(activated(QSystemTrayIcon::ActivationReason)), this, SLOT(on_activatedSysTrayIcon(QSystemTrayIcon::ActivationReason)));
+	//给QSystemTrayIcon添加槽函数
+	connect(mSysTrayIcon, SIGNAL(activated(QSystemTrayIcon::ActivationReason)), this, SLOT(on_activatedSysTrayIcon(QSystemTrayIcon::ActivationReason)));
 
-		//建立托盘操作的菜单
-		createActions();
-		createMenu();
-		//在系统托盘显示此对象
-		mSysTrayIcon->show();
-	
+	//建立托盘操作的菜单
+	createActions();
+	createMenu();
+	//在系统托盘显示此对象
+	mSysTrayIcon->show();
+
 }
 
 
@@ -236,11 +257,7 @@ void AutoCopy::on_activatedSysTrayIcon(QSystemTrayIcon::ActivationReason reason)
 {
 	switch (reason) {
 	case QSystemTrayIcon::Trigger:
-	/*	mSysTrayIcon->showMessage(QObject::trUtf8("Message Title"),
-			QObject::trUtf8("D0n't Close!!!"),
-			QSystemTrayIcon::Information,1000);
-		break;
-	case QSystemTrayIcon::DoubleClick:*/
+
 		this->show();
 		mSysTrayIcon->hide();
 		break;
@@ -279,6 +296,4 @@ void AutoCopy::on_exitAppAction()
 {
 	exit(0);
 }
-
-
 

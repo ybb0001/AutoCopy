@@ -1,20 +1,24 @@
-#pragma once
+#ifndef AutoCopy_H
+#define AutoCopy_H
 
-#include <QtWidgets/QMainWindow>
+#include <QtWidgets/QWidget>
 #include "ui_AutoCopy.h"
 #include <QSystemTrayIcon>
 #include <QMenu>
 #include <QAction>
 
+namespace Ui {
+	class mQWidget;
+}
 
-class AutoCopy : public QMainWindow
+class AutoCopy : public QWidget
 {
 	Q_OBJECT
 
 public:
+
 	explicit AutoCopy(QWidget *parent = Q_NULLPTR);
 	~AutoCopy();
-
 
 public:
 	QSystemTrayIcon *mSysTrayIcon = 0;
@@ -25,9 +29,9 @@ public:
 public:
 	void createActions();
 	void createMenu();
-	
 
-private slots:
+
+private slots :
 	void on_pushButton_Minimize_clicked();
 	void on_activatedSysTrayIcon(QSystemTrayIcon::ActivationReason reason);
 	void on_showMainAction();
@@ -37,8 +41,10 @@ private slots:
 	void on_pushButton_Save_clicked();
 
 
-
 private:
-	Ui::AutoCopyClass *ui;
-
+	Ui::mQWidget *ui;
 };
+
+
+
+#endif 
