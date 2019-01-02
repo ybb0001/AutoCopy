@@ -18,7 +18,8 @@ bool manual = false;
 int mode = 1;
 int copy_hour = 0, copy_minute = 0;
 string skip_Words[5] = { "" };
-string src = "", dst = "", setting = "";
+string src = "", dst = "", src2 = "", dst2 = "", src3 = "", dst3 = "";
+string setting = "", setting2 = "", setting3 = "";
 LPCWSTR Lsetting = TEXT("");
 HANDLE myHandle;
 
@@ -48,20 +49,20 @@ vector<string> getFiles(string cate_dir)
 	return files;
 }
 
-void get_Setting() {
+void get_Setting(string s) {
 
-	mode = GetPrivateProfileInt(_T("Copy_Setting"), TEXT("mode"), 0, CA2CT(setting.c_str()));
+	mode = GetPrivateProfileInt(_T("Copy_Setting"), TEXT("mode"), 0, CA2CT(s.c_str()));
 
 	TCHAR lpTexts[13];
-	GetPrivateProfileString(TEXT("Copy_Setting"), TEXT("skip_filename_Words_1"), TEXT(""), lpTexts, 12, CA2CT(setting.c_str()));
+	GetPrivateProfileString(TEXT("Copy_Setting"), TEXT("skip_filename_Words_1"), TEXT(""), lpTexts, 12, CA2CT(s.c_str()));
 	skip_Words[0] = CT2A(lpTexts);
-	GetPrivateProfileString(TEXT("Copy_Setting"), TEXT("skip_filename_Words_2"), TEXT(""), lpTexts, 12, CA2CT(setting.c_str()));
+	GetPrivateProfileString(TEXT("Copy_Setting"), TEXT("skip_filename_Words_2"), TEXT(""), lpTexts, 12, CA2CT(s.c_str()));
 	skip_Words[1] = CT2A(lpTexts);
-	GetPrivateProfileString(TEXT("Copy_Setting"), TEXT("skip_filename_Words_3"), TEXT(""), lpTexts, 12, CA2CT(setting.c_str()));
+	GetPrivateProfileString(TEXT("Copy_Setting"), TEXT("skip_filename_Words_3"), TEXT(""), lpTexts, 12, CA2CT(s.c_str()));
 	skip_Words[2] = CT2A(lpTexts);
-	GetPrivateProfileString(TEXT("Copy_Setting"), TEXT("skip_filename_Words_4"), TEXT(""), lpTexts, 12, CA2CT(setting.c_str()));
+	GetPrivateProfileString(TEXT("Copy_Setting"), TEXT("skip_filename_Words_4"), TEXT(""), lpTexts, 12, CA2CT(s.c_str()));
 	skip_Words[3] = CT2A(lpTexts);
-	GetPrivateProfileString(TEXT("Copy_Setting"), TEXT("skip_filename_Words_5"), TEXT(""), lpTexts, 12, CA2CT(setting.c_str()));
+	GetPrivateProfileString(TEXT("Copy_Setting"), TEXT("skip_filename_Words_5"), TEXT(""), lpTexts, 12, CA2CT(s.c_str()));
 	skip_Words[4] = CT2A(lpTexts);
 
 }
@@ -87,7 +88,7 @@ bool File_Name_Compare(string file) {
 
 void upload() {
 
-	get_Setting();
+	get_Setting(setting);
 	vector<string> files = getFiles(src + "*");
 	vector<string> ::iterator iVector = files.begin();
 	if (mode > 0){
@@ -102,6 +103,45 @@ void upload() {
 			++iVector;
 		}	
 	}
+
+	if (src2.length() > 5) {
+
+		get_Setting(setting2);
+		vector<string> files2 = getFiles(src2 + "*");
+		iVector = files2.begin();
+		if (mode > 0) {
+			while (iVector != files2.end())
+			{
+				string s = src2 + *iVector;
+				string d = dst2 + *iVector;
+
+				if (mode == 2 || !File_Name_Compare(*iVector))
+					CopyFile(CA2CT(s.c_str()), CA2CT(d.c_str()), true);
+
+				++iVector;
+			}
+		}
+	}
+
+	if (src3.length() > 5) {
+
+		get_Setting(setting3);
+		vector<string> files3 = getFiles(src3 + "*");
+		iVector = files3.begin();
+		if (mode > 0) {
+			while (iVector != files3.end())
+			{
+				string s = src3 + *iVector;
+				string d = dst3 + *iVector;
+
+				if (mode == 2 || !File_Name_Compare(*iVector))
+					CopyFile(CA2CT(s.c_str()), CA2CT(d.c_str()), true);
+
+				++iVector;
+			}
+		}
+	}
+
 }
 
 
@@ -118,9 +158,10 @@ DWORD WINAPI myThread(LPVOID argv) {
 			QTime ct = QTime::currentTime();
 			int hour_now = ct.hour();
 			int minute_now = ct.minute();
-			if (work && (hour_now >= copy_hour && minute_now > copy_minute)) {
+			if (work && (hour_now == copy_hour && minute_now > copy_minute)) {
 				upload();
-				work = false;
+				if(mode>0)
+					work = false;
 			}
 
 			if (mode > 2) {
@@ -155,17 +196,41 @@ AutoCopy::AutoCopy(QWidget *parent):
 	GetPrivateProfileString(TEXT("Path"), TEXT("to"), TEXT(""), lpTexts, 200, TEXT(".\\Setting\\Setting.ini"));
 	dst = CT2A(lpTexts);
 
+	GetPrivateProfileString(TEXT("Path"), TEXT("from2"), TEXT(""), lpTexts, 200, TEXT(".\\Setting\\Setting.ini"));
+	src2 = CT2A(lpTexts);
+	GetPrivateProfileString(TEXT("Path"), TEXT("to2"), TEXT(""), lpTexts, 200, TEXT(".\\Setting\\Setting.ini"));
+	dst2 = CT2A(lpTexts);
+
+	GetPrivateProfileString(TEXT("Path"), TEXT("from3"), TEXT(""), lpTexts, 200, TEXT(".\\Setting\\Setting.ini"));
+	src3 = CT2A(lpTexts);
+	GetPrivateProfileString(TEXT("Path"), TEXT("to3"), TEXT(""), lpTexts, 200, TEXT(".\\Setting\\Setting.ini"));
+	dst3 = CT2A(lpTexts);
+
+
 	copy_hour = GetPrivateProfileInt(_T("Time"), TEXT("hour"), 0, TEXT(".\\Setting\\Setting.ini"));
 	copy_minute = GetPrivateProfileInt(_T("Time"), TEXT("minute"), 0, TEXT(".\\Setting\\Setting.ini"));
 
 	ui->from->setText(src.c_str());
 	ui->to->setText(dst.c_str());
+	ui->from_2->setText(src2.c_str());
+	ui->to_2->setText(dst2.c_str());
+	ui->from_3->setText(src3.c_str());
+	ui->to_3->setText(dst3.c_str());
+
 	ui->hour->setText(QString::number(copy_hour,10));
 	ui->minute->setText(QString::number(copy_minute, 10));
 
 	src += "\\";
 	dst += "\\";
-	setting = dst + "copy_set.int";
+	src2 += "\\";
+	dst2 += "\\";
+	src3 += "\\";
+	dst3 += "\\";
+
+
+	setting = dst + "copy_set.ini";
+	setting2 = dst2 + "copy_set.ini";
+	setting3 = dst3 + "copy_set.ini";
 
 	on_pushButton_Minimize_clicked();
 	string s = "1";
@@ -220,9 +285,25 @@ void AutoCopy::on_pushButton_Save_clicked() {
 	WritePrivateProfileString(TEXT("Time"), TEXT("hour"), CA2CT(str_hour.c_str()), TEXT(".\\Setting\\Setting.ini"));
 	WritePrivateProfileString(TEXT("Time"), TEXT("minute"), CA2CT(str_minute.c_str()), TEXT(".\\Setting\\Setting.ini"));
 
+	src2 = ui->from_2->document()->toPlainText().toLocal8Bit().toStdString();
+	dst2 = ui->to_2->document()->toPlainText().toLocal8Bit().toStdString();
+
+	WritePrivateProfileString(TEXT("Path"), TEXT("from2"), CA2CT(src2.c_str()), TEXT(".\\Setting\\Setting.ini"));
+	WritePrivateProfileString(TEXT("Path"), TEXT("to2"), CA2CT(dst2.c_str()), TEXT(".\\Setting\\Setting.ini"));
+
+	src3 = ui->from_3->document()->toPlainText().toLocal8Bit().toStdString();
+	dst3 = ui->to_3->document()->toPlainText().toLocal8Bit().toStdString();
+
+	WritePrivateProfileString(TEXT("Path"), TEXT("from3"), CA2CT(src3.c_str()), TEXT(".\\Setting\\Setting.ini"));
+	WritePrivateProfileString(TEXT("Path"), TEXT("to3"), CA2CT(dst3.c_str()), TEXT(".\\Setting\\Setting.ini"));
+
 
 	src += "\\";
 	dst += "\\";
+	src2 += "\\";
+	dst2 += "\\";
+	src3 += "\\";
+	dst3 += "\\";
 
 }
 
