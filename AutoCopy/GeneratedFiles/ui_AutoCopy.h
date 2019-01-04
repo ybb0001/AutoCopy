@@ -138,7 +138,7 @@ public:
 
     void retranslateUi(QWidget *mQWidget)
     {
-        mQWidget->setWindowTitle(QApplication::translate("mQWidget", "AutoCopy_20180101", Q_NULLPTR));
+        mQWidget->setWindowTitle(QApplication::translate("mQWidget", "AutoCopy_20180105", Q_NULLPTR));
 #ifndef QT_NO_TOOLTIP
         pushButton_Minimize->setToolTip(QApplication::translate("mQWidget", "<html><head/><body><p>MiniMize Window</p><p><br/></p></body></html>", Q_NULLPTR));
 #endif // QT_NO_TOOLTIP

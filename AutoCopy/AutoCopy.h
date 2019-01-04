@@ -23,8 +23,10 @@ public:
 public:
 	QSystemTrayIcon *mSysTrayIcon = 0;
 	QMenu *mMenu = NULL;;
-	QAction *mShowMainAction = NULL;;
-	QAction *mExitAppAction = NULL;;
+	QAction *mShowMainAction = NULL;
+	QAction *mUploadAction = NULL;
+	QAction *mExitAppAction = NULL;
+
 
 public:
 	void createActions();
@@ -43,6 +45,12 @@ private slots :
 
 private:
 	Ui::mQWidget *ui;
+
+
+
+
+
+
 };
 
 

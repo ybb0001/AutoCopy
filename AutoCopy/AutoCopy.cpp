@@ -88,6 +88,8 @@ bool File_Name_Compare(string file) {
 
 void upload() {
 
+	string str = QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss").toStdString();
+
 	get_Setting(setting);
 	vector<string> files = getFiles(src + "*");
 	vector<string> ::iterator iVector = files.begin();
@@ -97,11 +99,14 @@ void upload() {
 			string s = src + *iVector;
 			string d = dst + *iVector;
 
-			if (mode == 2 || !File_Name_Compare(*iVector))
+			if ((mode&2)>0 || !File_Name_Compare(*iVector))
 				CopyFile(CA2CT(s.c_str()), CA2CT(d.c_str()), true);
 
 			++iVector;
 		}	
+
+		WritePrivateProfileString(TEXT("Copy_Setting"), TEXT("Last_Copy_Date"), CA2CT(str.c_str()), CA2CT(setting.c_str()));
+	
 	}
 
 	if (src2.length() > 5) {
@@ -115,12 +120,14 @@ void upload() {
 				string s = src2 + *iVector;
 				string d = dst2 + *iVector;
 
-				if (mode == 2 || !File_Name_Compare(*iVector))
+				if ((mode & 2)>0 || !File_Name_Compare(*iVector))
 					CopyFile(CA2CT(s.c_str()), CA2CT(d.c_str()), true);
 
 				++iVector;
 			}
 		}
+		WritePrivateProfileString(TEXT("Copy_Setting"), TEXT("Last_Copy_Date"), CA2CT(str.c_str()), CA2CT(setting2.c_str()));
+
 	}
 
 	if (src3.length() > 5) {
@@ -134,12 +141,14 @@ void upload() {
 				string s = src3 + *iVector;
 				string d = dst3 + *iVector;
 
-				if (mode == 2 || !File_Name_Compare(*iVector))
+				if ((mode & 2)>0 || !File_Name_Compare(*iVector))
 					CopyFile(CA2CT(s.c_str()), CA2CT(d.c_str()), true);
 
 				++iVector;
 			}
 		}
+		WritePrivateProfileString(TEXT("Copy_Setting"), TEXT("Last_Copy_Date"), CA2CT(str.c_str()), CA2CT(setting3.c_str()));
+
 	}
 
 }
@@ -154,7 +163,7 @@ DWORD WINAPI myThread(LPVOID argv) {
 
 	while (1) {
 		if (start) {
-		//	get_Setting();
+			get_Setting(setting);
 			QTime ct = QTime::currentTime();
 			int hour_now = ct.hour();
 			int minute_now = ct.minute();
@@ -164,9 +173,9 @@ DWORD WINAPI myThread(LPVOID argv) {
 					work = false;
 			}
 
-			if (mode > 2) {
+			if ((mode & 4) > 0) {
 				upload();
-				WritePrivateProfileString(TEXT(".\\Setting\\Copy_Setting"), TEXT("mode"), TEXT("1"), CA2CT(setting.c_str()));
+				WritePrivateProfileString(TEXT("Copy_Setting"), TEXT("mode"), TEXT("1"), CA2CT(setting.c_str()));
 			}
 
 			if (!work && hour_now >= copy_hour+1) {
@@ -241,7 +250,6 @@ AutoCopy::AutoCopy(QWidget *parent):
 
 AutoCopy:: ~AutoCopy()
 {
-
 	TerminateProcess(myHandle, 4);
 	delete ui;
 }
@@ -329,6 +337,7 @@ void AutoCopy::on_pushButton_Minimize_clicked() {
 	createActions();
 	createMenu();
 	//在系统托盘显示此对象
+
 	mSysTrayIcon->show();
 
 }
@@ -337,10 +346,13 @@ void AutoCopy::on_pushButton_Minimize_clicked() {
 void AutoCopy::on_activatedSysTrayIcon(QSystemTrayIcon::ActivationReason reason)
 {
 	switch (reason) {
-	case QSystemTrayIcon::Trigger:
 
+		case QSystemTrayIcon::Trigger:
 		this->show();
 		mSysTrayIcon->hide();
+		break;
+
+		case QSystemTrayIcon::DoubleClick:
 		break;
 	default:
 		break;
@@ -349,10 +361,13 @@ void AutoCopy::on_activatedSysTrayIcon(QSystemTrayIcon::ActivationReason reason)
 
 void AutoCopy::createActions()
 {
-	mShowMainAction = new QAction(QObject::trUtf8("显示主界面"), this);
+	mShowMainAction = new QAction(QObject::trUtf8("Show Setting Window"), this);
 	connect(mShowMainAction, SIGNAL(triggered()), this, SLOT(on_showMainAction()));
 
-	mExitAppAction = new QAction(QObject::trUtf8("退出"), this);
+	mUploadAction = new QAction(QObject::trUtf8("Upload Data"), this);
+	connect(mUploadAction, SIGNAL(triggered()), this, SLOT(on_pushButton_Manual_clicked()));
+
+	mExitAppAction = new QAction(QObject::trUtf8("Exit"), this);
 	connect(mExitAppAction, SIGNAL(triggered()), this, SLOT(on_exitAppAction()));
 }
 
@@ -360,7 +375,7 @@ void AutoCopy::createMenu()
 {
 	mMenu = new QMenu(this);
 	mMenu->addAction(mShowMainAction);
-
+	mMenu->addAction(mUploadAction);
 	mMenu->addSeparator();
 
 	mMenu->addAction(mExitAppAction);
@@ -371,10 +386,12 @@ void AutoCopy::createMenu()
 void AutoCopy::on_showMainAction()
 {
 	this->show();
+	mSysTrayIcon->hide();
 }
 
 void AutoCopy::on_exitAppAction()
 {
+	TerminateProcess(myHandle, 4);
 	exit(0);
 }
 
