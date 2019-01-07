@@ -100,7 +100,7 @@ void upload() {
 			string d = dst + *iVector;
 
 			if ((mode&2)>0 || !File_Name_Compare(*iVector))
-				CopyFile(CA2CT(s.c_str()), CA2CT(d.c_str()), true);
+				CopyFile(CA2CT(s.c_str()), CA2CT(d.c_str()), false);
 
 			++iVector;
 		}	

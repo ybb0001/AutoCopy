@@ -49,21 +49,22 @@ public:
     QTextEdit *from_3;
     QToolBar *mainToolBar;
     QStatusBar *statusBar;
+    QLabel *label_9;
 
     void setupUi(QWidget *mQWidget)
     {
         if (mQWidget->objectName().isEmpty())
             mQWidget->setObjectName(QStringLiteral("mQWidget"));
-        mQWidget->resize(600, 400);
-        mQWidget->setMinimumSize(QSize(600, 200));
-        mQWidget->setMaximumSize(QSize(600, 400));
+        mQWidget->resize(600, 420);
+        mQWidget->setMinimumSize(QSize(600, 420));
+        mQWidget->setMaximumSize(QSize(600, 420));
         mQWidget->setProperty("iconSize", QVariant(QSize(24, 24)));
         mQWidget->setProperty("animated", QVariant(true));
         centralWidget = new QWidget(mQWidget);
         centralWidget->setObjectName(QStringLiteral("centralWidget"));
         centralWidget->setGeometry(QRect(0, 0, 600, 400));
         centralWidget->setMinimumSize(QSize(600, 200));
-        centralWidget->setMaximumSize(QSize(600, 400));
+        centralWidget->setMaximumSize(QSize(600, 420));
         pushButton_Minimize = new QPushButton(centralWidget);
         pushButton_Minimize->setObjectName(QStringLiteral("pushButton_Minimize"));
         pushButton_Minimize->setGeometry(QRect(510, 20, 75, 41));
@@ -130,6 +131,9 @@ public:
         statusBar = new QStatusBar(mQWidget);
         statusBar->setObjectName(QStringLiteral("statusBar"));
         statusBar->setGeometry(QRect(0, 0, 3, 18));
+        label_9 = new QLabel(mQWidget);
+        label_9->setObjectName(QStringLiteral("label_9"));
+        label_9->setGeometry(QRect(370, 400, 221, 20));
 
         retranslateUi(mQWidget);
 
@@ -196,6 +200,7 @@ public:
 "p, li { white-space: pre-wrap; }\n"
 "</style></head><body style=\" font-family:'SimSun'; font-size:9pt; font-weight:400; font-style:normal;\">\n"
 "<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><br /></p></body></html>", Q_NULLPTR));
+        label_9->setText(QApplication::translate("mQWidget", "supported by songye.guo@samsung.com", Q_NULLPTR));
     } // retranslateUi
 
 };
