@@ -19,6 +19,7 @@ int mode = 1;
 int copy_hour = 0, copy_minute = 0;
 string skip_Words[5] = { "" };
 string src = "", dst = "", src2 = "", dst2 = "", src3 = "", dst3 = "";
+string upper_src = "", upper_src2 = "", upper_src3 = "";
 string setting = "", setting2 = "", setting3 = "";
 LPCWSTR Lsetting = TEXT("");
 HANDLE myHandle;
@@ -86,27 +87,61 @@ bool File_Name_Compare(string file) {
 	return false;
 }
 
+
+bool CopressFileCheck(string s) {
+
+	if (s[s.size() - 1] == 'r' || s[s.size() - 1] == 'R')
+		if (s[s.size() - 2] == 'a' || s[s.size() - 2] == 'A')
+			if (s[s.size() - 3] == 'r' || s[s.size() - 3] == 'R')
+				if (s[s.size() - 4] == '.')
+					return true;
+
+	if (s[s.size() - 1] == 'p' || s[s.size() - 1] == 'P')
+		if (s[s.size() - 2] == 'i' || s[s.size() - 2] == 'I')
+			if (s[s.size() - 3] == 'z' || s[s.size() - 3] == 'Z')
+				if (s[s.size() - 4] == '.')
+					return true;
+
+	return false;
+
+}
+
+
 void upload() {
 
 	string str = QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss").toStdString();
 
 	get_Setting(setting);
-	vector<string> files = getFiles(src + "*");
-	vector<string> ::iterator iVector = files.begin();
-	if (mode > 0){
-		while (iVector != files.end())
+	vector<string> files1 = getFiles(src + "*");
+	vector<string> ::iterator iVector = files1.begin();
+
+	if (mode > 0) {
+		while (iVector != files1.end())
 		{
 			string s = src + *iVector;
 			string d = dst + *iVector;
 
-			if ((mode&2)>0 || !File_Name_Compare(*iVector))
+			if ((mode & 2)>0 || !File_Name_Compare(*iVector))
 				CopyFile(CA2CT(s.c_str()), CA2CT(d.c_str()), false);
 
 			++iVector;
-		}	
+		}
 
 		WritePrivateProfileString(TEXT("Copy_Setting"), TEXT("Last_Copy_Date"), CA2CT(str.c_str()), CA2CT(setting.c_str()));
-	
+
+		vector<string> files11 = getFiles(upper_src + "*");
+		iVector = files11.begin();
+		while (iVector != files11.end())
+		{
+			string s = upper_src + *iVector;
+			string d = dst + *iVector;
+
+			if (CopressFileCheck(s))
+				CopyFile(CA2CT(s.c_str()), CA2CT(d.c_str()), false);
+
+			++iVector;
+		}
+
 	}
 
 	if (src2.length() > 5) {
@@ -114,6 +149,7 @@ void upload() {
 		get_Setting(setting2);
 		vector<string> files2 = getFiles(src2 + "*");
 		iVector = files2.begin();
+
 		if (mode > 0) {
 			while (iVector != files2.end())
 			{
@@ -128,6 +164,19 @@ void upload() {
 		}
 		WritePrivateProfileString(TEXT("Copy_Setting"), TEXT("Last_Copy_Date"), CA2CT(str.c_str()), CA2CT(setting2.c_str()));
 
+		vector<string> files22 = getFiles(upper_src2 + "*");
+		iVector = files22.begin();
+
+		while (iVector != files22.end())
+		{
+			string s = upper_src2 + *iVector;
+			string d = dst2 + *iVector;
+
+			if (CopressFileCheck(s))
+				CopyFile(CA2CT(s.c_str()), CA2CT(d.c_str()), false);
+
+			++iVector;
+		}
 	}
 
 	if (src3.length() > 5) {
@@ -148,8 +197,22 @@ void upload() {
 			}
 		}
 		WritePrivateProfileString(TEXT("Copy_Setting"), TEXT("Last_Copy_Date"), CA2CT(str.c_str()), CA2CT(setting3.c_str()));
+		
+		vector<string> files33 = getFiles(upper_src3 + "*");
+		iVector = files33.begin();
 
+		while (iVector != files33.end())
+		{
+			string s = upper_src3 + *iVector;
+			string d = dst3 + *iVector;
+
+			if (CopressFileCheck(s))
+				CopyFile(CA2CT(s.c_str()), CA2CT(d.c_str()), false);
+
+			++iVector;
+		}
 	}
+
 
 }
 
@@ -169,7 +232,7 @@ DWORD WINAPI myThread(LPVOID argv) {
 			int minute_now = ct.minute();
 			if (work && (hour_now == copy_hour && minute_now > copy_minute)) {
 				upload();
-				if(mode>0)
+				if (mode>0)
 					work = false;
 			}
 
@@ -178,7 +241,7 @@ DWORD WINAPI myThread(LPVOID argv) {
 				WritePrivateProfileString(TEXT("Copy_Setting"), TEXT("mode"), TEXT("1"), CA2CT(setting.c_str()));
 			}
 
-			if (!work && hour_now >= copy_hour+1) {
+			if (!work && hour_now >= copy_hour + 1) {
 				work = true;
 			}
 		}
@@ -192,7 +255,7 @@ DWORD WINAPI myThread(LPVOID argv) {
 }
 
 
-AutoCopy::AutoCopy(QWidget *parent): 
+AutoCopy::AutoCopy(QWidget *parent) :
 	QWidget(parent),
 	ui(new Ui::mQWidget)
 {
@@ -202,16 +265,22 @@ AutoCopy::AutoCopy(QWidget *parent):
 	TCHAR lpTexts[200];
 	GetPrivateProfileString(TEXT("Path"), TEXT("from"), TEXT(""), lpTexts, 200, TEXT(".\\Setting\\Setting.ini"));
 	src = CT2A(lpTexts);
+	upper_src = src.substr(0, src.size() - 5);
+
 	GetPrivateProfileString(TEXT("Path"), TEXT("to"), TEXT(""), lpTexts, 200, TEXT(".\\Setting\\Setting.ini"));
 	dst = CT2A(lpTexts);
 
 	GetPrivateProfileString(TEXT("Path"), TEXT("from2"), TEXT(""), lpTexts, 200, TEXT(".\\Setting\\Setting.ini"));
 	src2 = CT2A(lpTexts);
+	upper_src2 = src2.substr(0, src2.size() - 5);
+
 	GetPrivateProfileString(TEXT("Path"), TEXT("to2"), TEXT(""), lpTexts, 200, TEXT(".\\Setting\\Setting.ini"));
 	dst2 = CT2A(lpTexts);
 
 	GetPrivateProfileString(TEXT("Path"), TEXT("from3"), TEXT(""), lpTexts, 200, TEXT(".\\Setting\\Setting.ini"));
 	src3 = CT2A(lpTexts);
+	upper_src3 = src3.substr(0, src3.size() - 5);
+
 	GetPrivateProfileString(TEXT("Path"), TEXT("to3"), TEXT(""), lpTexts, 200, TEXT(".\\Setting\\Setting.ini"));
 	dst3 = CT2A(lpTexts);
 
@@ -226,14 +295,17 @@ AutoCopy::AutoCopy(QWidget *parent):
 	ui->from_3->setText(src3.c_str());
 	ui->to_3->setText(dst3.c_str());
 
-	ui->hour->setText(QString::number(copy_hour,10));
+	ui->hour->setText(QString::number(copy_hour, 10));
 	ui->minute->setText(QString::number(copy_minute, 10));
 
 	src += "\\";
+	upper_src += "\\";
 	dst += "\\";
 	src2 += "\\";
+	upper_src2 += "\\";
 	dst2 += "\\";
 	src3 += "\\";
+	upper_src3 += "\\";
 	dst3 += "\\";
 
 
@@ -347,12 +419,12 @@ void AutoCopy::on_activatedSysTrayIcon(QSystemTrayIcon::ActivationReason reason)
 {
 	switch (reason) {
 
-		case QSystemTrayIcon::Trigger:
+	case QSystemTrayIcon::Trigger:
 		this->show();
 		mSysTrayIcon->hide();
 		break;
 
-		case QSystemTrayIcon::DoubleClick:
+	case QSystemTrayIcon::DoubleClick:
 		break;
 	default:
 		break;

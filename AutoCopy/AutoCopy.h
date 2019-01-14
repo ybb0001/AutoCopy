@@ -27,11 +27,9 @@ public:
 	QAction *mUploadAction = NULL;
 	QAction *mExitAppAction = NULL;
 
-
 public:
 	void createActions();
 	void createMenu();
-
 
 private slots :
 	void on_pushButton_Minimize_clicked();
@@ -46,13 +44,6 @@ private slots :
 private:
 	Ui::mQWidget *ui;
 
-
-
-
-
-
 };
-
-
 
 #endif 

@@ -36,9 +36,6 @@
     <ClCompile Include="AutoCopy.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="folder_Copy.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="AutoCopy.h">
