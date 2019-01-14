@@ -394,4 +394,17 @@ void AutoCopy::on_exitAppAction()
 	TerminateProcess(myHandle, 4);
 	exit(0);
 }
-
+//
+//BOOL CopyDir(LPCTSTR lpszSrcDir, LPCTSTR lpszDstDir) 
+//{
+//	SHFILEOPSTRUCT sfo;
+//	ZeroMemory(&sfo, sizeof(sfo));
+//	sfo.wFunc = FO_COPY;
+//	sfo.pFrom = lpszSrcDir;
+//	sfo.pTo = lpszDstDir;
+//	sfo.fFlags = FOF_SILENT | FOF_NOCONFIRMATION | FOF_NOCONFIRMMKDIR;
+//	int ret = SHFileOperation(&sfo);
+//	if (ret == 0)
+//		return TRUE;
+//	else return FALSE;
+//}
