@@ -115,7 +115,7 @@ void upload() {
 	vector<string> files1 = getFiles(src + "*");
 	vector<string> ::iterator iVector = files1.begin();
 
-	if (mode > 0) {
+	if (mode > 0&& src.length() > 5) {
 		while (iVector != files1.end())
 		{
 			string s = src + *iVector;
@@ -129,19 +129,20 @@ void upload() {
 
 		WritePrivateProfileString(TEXT("Copy_Setting"), TEXT("Last_Copy_Date"), CA2CT(str.c_str()), CA2CT(setting.c_str()));
 
-		vector<string> files11 = getFiles(upper_src + "*");
-		iVector = files11.begin();
-		while (iVector != files11.end())
-		{
-			string s = upper_src + *iVector;
-			string d = dst + *iVector;
+		if (upper_src.size() > 2 && (mode & 8) > 0) {
+			vector<string> files11 = getFiles(upper_src + "*");
+			iVector = files11.begin();
+			while (iVector != files11.end())
+			{
+				string s = upper_src + *iVector;
+				string d = dst + *iVector;
 
-			if (CopressFileCheck(s))
-				CopyFile(CA2CT(s.c_str()), CA2CT(d.c_str()), false);
+				if (CopressFileCheck(s))
+					CopyFile(CA2CT(s.c_str()), CA2CT(d.c_str()), false);
 
-			++iVector;
+				++iVector;
+			}
 		}
-
 	}
 
 	if (src2.length() > 5) {
@@ -163,19 +164,21 @@ void upload() {
 			}
 		}
 		WritePrivateProfileString(TEXT("Copy_Setting"), TEXT("Last_Copy_Date"), CA2CT(str.c_str()), CA2CT(setting2.c_str()));
+		
+		if (upper_src3.size() > 2 && (mode & 8) > 0) {
+			vector<string> files22 = getFiles(upper_src2 + "*");
+			iVector = files22.begin();
 
-		vector<string> files22 = getFiles(upper_src2 + "*");
-		iVector = files22.begin();
+			while (iVector != files22.end())
+			{
+				string s = upper_src2 + *iVector;
+				string d = dst2 + *iVector;
 
-		while (iVector != files22.end())
-		{
-			string s = upper_src2 + *iVector;
-			string d = dst2 + *iVector;
+				if (CopressFileCheck(s))
+					CopyFile(CA2CT(s.c_str()), CA2CT(d.c_str()), false);
 
-			if (CopressFileCheck(s))
-				CopyFile(CA2CT(s.c_str()), CA2CT(d.c_str()), false);
-
-			++iVector;
+				++iVector;
+			}
 		}
 	}
 
@@ -190,29 +193,30 @@ void upload() {
 				string s = src3 + *iVector;
 				string d = dst3 + *iVector;
 
-				if ((mode & 2)>0 || !File_Name_Compare(*iVector))
+				if ((mode & 2) > 0 || !File_Name_Compare(*iVector))
 					CopyFile(CA2CT(s.c_str()), CA2CT(d.c_str()), true);
 
 				++iVector;
 			}
 		}
 		WritePrivateProfileString(TEXT("Copy_Setting"), TEXT("Last_Copy_Date"), CA2CT(str.c_str()), CA2CT(setting3.c_str()));
-		
-		vector<string> files33 = getFiles(upper_src3 + "*");
-		iVector = files33.begin();
 
-		while (iVector != files33.end())
-		{
-			string s = upper_src3 + *iVector;
-			string d = dst3 + *iVector;
+		if (upper_src3.size() > 2 && (mode & 8) > 0){
+			vector<string> files33 = getFiles(upper_src3 + "*");
+			iVector = files33.begin();
 
-			if (CopressFileCheck(s))
-				CopyFile(CA2CT(s.c_str()), CA2CT(d.c_str()), false);
+			while (iVector != files33.end())
+			{
+				string s = upper_src3 + *iVector;
+				string d = dst3 + *iVector;
 
-			++iVector;
+				if (CopressFileCheck(s))
+					CopyFile(CA2CT(s.c_str()), CA2CT(d.c_str()), false);
+
+				++iVector;
+			}
 		}
 	}
-
 
 }
 
@@ -254,32 +258,44 @@ DWORD WINAPI myThread(LPVOID argv) {
 	return NULL;
 }
 
+int getLastPath(string s) {
+
+	int len = s.length()-1;
+	while (len > 0 && s[len] != '\\'){
+		len--;
+	}
+	return len+1;
+}
+
 
 AutoCopy::AutoCopy(QWidget *parent) :
 	QWidget(parent),
 	ui(new Ui::mQWidget)
 {
-
+	int lastPath;
 	ui->setupUi(this);
 
 	TCHAR lpTexts[200];
 	GetPrivateProfileString(TEXT("Path"), TEXT("from"), TEXT(""), lpTexts, 200, TEXT(".\\Setting\\Setting.ini"));
 	src = CT2A(lpTexts);
-	upper_src = src.substr(0, src.size() - 5);
+	lastPath = getLastPath(src);
+	upper_src = src.substr(0, lastPath);
 
 	GetPrivateProfileString(TEXT("Path"), TEXT("to"), TEXT(""), lpTexts, 200, TEXT(".\\Setting\\Setting.ini"));
 	dst = CT2A(lpTexts);
 
 	GetPrivateProfileString(TEXT("Path"), TEXT("from2"), TEXT(""), lpTexts, 200, TEXT(".\\Setting\\Setting.ini"));
 	src2 = CT2A(lpTexts);
-	upper_src2 = src2.substr(0, src2.size() - 5);
+	lastPath = getLastPath(src2);
+	upper_src2 = src2.substr(0, lastPath);
 
 	GetPrivateProfileString(TEXT("Path"), TEXT("to2"), TEXT(""), lpTexts, 200, TEXT(".\\Setting\\Setting.ini"));
 	dst2 = CT2A(lpTexts);
 
 	GetPrivateProfileString(TEXT("Path"), TEXT("from3"), TEXT(""), lpTexts, 200, TEXT(".\\Setting\\Setting.ini"));
 	src3 = CT2A(lpTexts);
-	upper_src3 = src3.substr(0, src3.size() - 5);
+	lastPath = getLastPath(src3);
+	upper_src3 = src3.substr(0, lastPath);
 
 	GetPrivateProfileString(TEXT("Path"), TEXT("to3"), TEXT(""), lpTexts, 200, TEXT(".\\Setting\\Setting.ini"));
 	dst3 = CT2A(lpTexts);
@@ -299,13 +315,13 @@ AutoCopy::AutoCopy(QWidget *parent) :
 	ui->minute->setText(QString::number(copy_minute, 10));
 
 	src += "\\";
-	upper_src += "\\";
+//	upper_src += "\\";
 	dst += "\\";
 	src2 += "\\";
-	upper_src2 += "\\";
+//	upper_src2 += "\\";
 	dst2 += "\\";
 	src3 += "\\";
-	upper_src3 += "\\";
+//	upper_src3 += "\\";
 	dst3 += "\\";
 
 
