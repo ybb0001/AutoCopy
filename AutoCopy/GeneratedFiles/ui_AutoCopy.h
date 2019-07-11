@@ -47,6 +47,8 @@ public:
     QLabel *label_7;
     QLabel *label_8;
     QTextEdit *from_3;
+    QTextEdit *del_path;
+    QLabel *label_10;
     QToolBar *mainToolBar;
     QStatusBar *statusBar;
     QLabel *label_9;
@@ -55,16 +57,16 @@ public:
     {
         if (mQWidget->objectName().isEmpty())
             mQWidget->setObjectName(QStringLiteral("mQWidget"));
-        mQWidget->resize(600, 420);
-        mQWidget->setMinimumSize(QSize(600, 420));
-        mQWidget->setMaximumSize(QSize(600, 420));
+        mQWidget->resize(600, 440);
+        mQWidget->setMinimumSize(QSize(600, 400));
+        mQWidget->setMaximumSize(QSize(600, 440));
         mQWidget->setProperty("iconSize", QVariant(QSize(24, 24)));
         mQWidget->setProperty("animated", QVariant(true));
         centralWidget = new QWidget(mQWidget);
         centralWidget->setObjectName(QStringLiteral("centralWidget"));
-        centralWidget->setGeometry(QRect(0, 0, 600, 400));
-        centralWidget->setMinimumSize(QSize(600, 200));
-        centralWidget->setMaximumSize(QSize(600, 420));
+        centralWidget->setGeometry(QRect(0, 0, 600, 450));
+        centralWidget->setMinimumSize(QSize(600, 450));
+        centralWidget->setMaximumSize(QSize(600, 450));
         pushButton_Minimize = new QPushButton(centralWidget);
         pushButton_Minimize->setObjectName(QStringLiteral("pushButton_Minimize"));
         pushButton_Minimize->setGeometry(QRect(510, 20, 75, 41));
@@ -88,19 +90,19 @@ public:
         pushButton_Manual->setGeometry(QRect(510, 130, 75, 40));
         pushButton_Save = new QPushButton(centralWidget);
         pushButton_Save->setObjectName(QStringLiteral("pushButton_Save"));
-        pushButton_Save->setGeometry(QRect(390, 365, 75, 25));
+        pushButton_Save->setGeometry(QRect(510, 330, 75, 25));
         label_3 = new QLabel(centralWidget);
         label_3->setObjectName(QStringLiteral("label_3"));
-        label_3->setGeometry(QRect(137, 370, 121, 16));
+        label_3->setGeometry(QRect(510, 270, 81, 20));
         hour = new QTextEdit(centralWidget);
         hour->setObjectName(QStringLiteral("hour"));
-        hour->setGeometry(QRect(247, 365, 31, 25));
+        hour->setGeometry(QRect(510, 290, 31, 25));
         minute = new QTextEdit(centralWidget);
         minute->setObjectName(QStringLiteral("minute"));
-        minute->setGeometry(QRect(287, 365, 31, 25));
+        minute->setGeometry(QRect(550, 290, 31, 25));
         label_4 = new QLabel(centralWidget);
         label_4->setObjectName(QStringLiteral("label_4"));
-        label_4->setGeometry(QRect(280, 370, 16, 16));
+        label_4->setGeometry(QRect(543, 295, 16, 16));
         label_5 = new QLabel(centralWidget);
         label_5->setObjectName(QStringLiteral("label_5"));
         label_5->setGeometry(QRect(10, 185, 61, 16));
@@ -125,6 +127,12 @@ public:
         from_3 = new QTextEdit(centralWidget);
         from_3->setObjectName(QStringLiteral("from_3"));
         from_3->setGeometry(QRect(10, 260, 480, 40));
+        del_path = new QTextEdit(centralWidget);
+        del_path->setObjectName(QStringLiteral("del_path"));
+        del_path->setGeometry(QRect(10, 380, 480, 40));
+        label_10 = new QLabel(centralWidget);
+        label_10->setObjectName(QStringLiteral("label_10"));
+        label_10->setGeometry(QRect(10, 365, 131, 16));
         mainToolBar = new QToolBar(mQWidget);
         mainToolBar->setObjectName(QStringLiteral("mainToolBar"));
         mainToolBar->setGeometry(QRect(0, 0, 4, 12));
@@ -133,7 +141,7 @@ public:
         statusBar->setGeometry(QRect(0, 0, 3, 18));
         label_9 = new QLabel(mQWidget);
         label_9->setObjectName(QStringLiteral("label_9"));
-        label_9->setGeometry(QRect(370, 400, 221, 20));
+        label_9->setGeometry(QRect(370, 420, 221, 20));
 
         retranslateUi(mQWidget);
 
@@ -142,7 +150,7 @@ public:
 
     void retranslateUi(QWidget *mQWidget)
     {
-        mQWidget->setWindowTitle(QApplication::translate("mQWidget", "AutoCopy_20190117", Q_NULLPTR));
+        mQWidget->setWindowTitle(QApplication::translate("mQWidget", "AutoCopy_20190711", Q_NULLPTR));
 #ifndef QT_NO_TOOLTIP
         pushButton_Minimize->setToolTip(QApplication::translate("mQWidget", "<html><head/><body><p>MiniMize Window</p><p><br/></p></body></html>", Q_NULLPTR));
 #endif // QT_NO_TOOLTIP
@@ -164,7 +172,7 @@ public:
         pushButton_Manual->setText(QApplication::translate("mQWidget", "Manual\n"
 "Upload", Q_NULLPTR));
         pushButton_Save->setText(QApplication::translate("mQWidget", "Save", Q_NULLPTR));
-        label_3->setText(QApplication::translate("mQWidget", "Auto Updata Time:", Q_NULLPTR));
+        label_3->setText(QApplication::translate("mQWidget", "Upload Time:", Q_NULLPTR));
         hour->setHtml(QApplication::translate("mQWidget", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
 "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
 "p, li { white-space: pre-wrap; }\n"
@@ -200,6 +208,12 @@ public:
 "p, li { white-space: pre-wrap; }\n"
 "</style></head><body style=\" font-family:'SimSun'; font-size:9pt; font-weight:400; font-style:normal;\">\n"
 "<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><br /></p></body></html>", Q_NULLPTR));
+        del_path->setHtml(QApplication::translate("mQWidget", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
+"<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
+"p, li { white-space: pre-wrap; }\n"
+"</style></head><body style=\" font-family:'SimSun'; font-size:9pt; font-weight:400; font-style:normal;\">\n"
+"<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><br /></p></body></html>", Q_NULLPTR));
+        label_10->setText(QApplication::translate("mQWidget", "auto delete path", Q_NULLPTR));
         label_9->setText(QApplication::translate("mQWidget", "supported by songye.guo@samsung.com", Q_NULLPTR));
     } // retranslateUi
 

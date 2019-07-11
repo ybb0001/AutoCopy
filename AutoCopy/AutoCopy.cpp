@@ -18,7 +18,7 @@ bool manual = false;
 int mode = 1;
 int copy_hour = 0, copy_minute = 0;
 string skip_Words[5] = { "" };
-string src = "", dst = "", src2 = "", dst2 = "", src3 = "", dst3 = "";
+string src = "", dst = "", src2 = "", dst2 = "", src3 = "", dst3 = "", del_path = "";
 string upper_src = "", upper_src2 = "", upper_src3 = "";
 string setting = "", setting2 = "", setting3 = "";
 LPCWSTR Lsetting = TEXT("");
@@ -218,6 +218,19 @@ void upload() {
 		}
 	}
 
+
+	if (del_path.length() > 5) {
+
+		vector<string> files4 = getFiles(del_path + "*");
+		iVector = files4.begin();	
+		while (iVector != files4.end())
+		{
+			string s = del_path + *iVector;
+			DeleteFile(CA2CT(s.c_str()));
+			++iVector;
+		}	
+	}
+
 }
 
 
@@ -300,6 +313,9 @@ AutoCopy::AutoCopy(QWidget *parent) :
 	GetPrivateProfileString(TEXT("Path"), TEXT("to3"), TEXT(""), lpTexts, 200, TEXT(".\\Setting\\Setting.ini"));
 	dst3 = CT2A(lpTexts);
 
+	GetPrivateProfileString(TEXT("Path"), TEXT("del_path"), TEXT(""), lpTexts, 200, TEXT(".\\Setting\\Setting.ini"));
+	del_path = CT2A(lpTexts);
+
 
 	copy_hour = GetPrivateProfileInt(_T("Time"), TEXT("hour"), 0, TEXT(".\\Setting\\Setting.ini"));
 	copy_minute = GetPrivateProfileInt(_T("Time"), TEXT("minute"), 0, TEXT(".\\Setting\\Setting.ini"));
@@ -310,6 +326,7 @@ AutoCopy::AutoCopy(QWidget *parent) :
 	ui->to_2->setText(dst2.c_str());
 	ui->from_3->setText(src3.c_str());
 	ui->to_3->setText(dst3.c_str());
+	ui->del_path->setText(del_path.c_str());
 
 	ui->hour->setText(QString::number(copy_hour, 10));
 	ui->minute->setText(QString::number(copy_minute, 10));
@@ -323,6 +340,7 @@ AutoCopy::AutoCopy(QWidget *parent) :
 	src3 += "\\";
 //	upper_src3 += "\\";
 	dst3 += "\\";
+	del_path += "\\";
 
 
 	setting = dst + "copy_set.ini";
@@ -393,6 +411,8 @@ void AutoCopy::on_pushButton_Save_clicked() {
 	WritePrivateProfileString(TEXT("Path"), TEXT("from3"), CA2CT(src3.c_str()), TEXT(".\\Setting\\Setting.ini"));
 	WritePrivateProfileString(TEXT("Path"), TEXT("to3"), CA2CT(dst3.c_str()), TEXT(".\\Setting\\Setting.ini"));
 
+	del_path=ui->del_path->document()->toPlainText().toLocal8Bit().toStdString();
+	WritePrivateProfileString(TEXT("Path"), TEXT("del_path"), CA2CT(del_path.c_str()), TEXT(".\\Setting\\Setting.ini"));
 
 	src += "\\";
 	dst += "\\";
@@ -400,6 +420,7 @@ void AutoCopy::on_pushButton_Save_clicked() {
 	dst2 += "\\";
 	src3 += "\\";
 	dst3 += "\\";
+	del_path += "\\";
 
 }
 
