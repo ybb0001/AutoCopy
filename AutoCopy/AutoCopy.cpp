@@ -18,6 +18,7 @@ bool manual = false;
 int mode = 1;
 int copy_hour = 0, copy_minute = 0;
 string skip_Words[5] = { "" };
+string del_Path_Words[3] = { "temp","log","mes" };
 string src = "", dst = "", src2 = "", dst2 = "", src3 = "", dst3 = "", del_path = "";
 string upper_src = "", upper_src2 = "", upper_src3 = "";
 string setting = "", setting2 = "", setting3 = "";
@@ -68,6 +69,19 @@ void get_Setting(string s) {
 
 }
 
+bool capital_samll_check(char a, char b) {
+
+	if (a == b)
+		return true;
+	if(a<96 && a+32==b)
+		return true;
+	if (a>96 && a - 32 == b)
+		return true;
+
+	return false;
+}
+
+
 bool File_Name_Compare(string file) {
 
 	for (int k = 0; k < 5; k++) {
@@ -87,6 +101,25 @@ bool File_Name_Compare(string file) {
 	return false;
 }
 
+
+bool del_Path_Compare(string file) {
+
+	for (int k = 0; k < 3; k++) {
+		if (del_Path_Words[k].length()>2) {
+			for (int i = 0; i < file.length(); i++) {
+				if (capital_samll_check(file[i], del_Path_Words[k][0])) {
+					int e = 0;
+					while (e < del_Path_Words[k].length() && capital_samll_check(file[i+e], del_Path_Words[k][e])) {
+						e++;
+					}
+					if (e == del_Path_Words[k].length())
+						return true;
+				}
+			}
+		}
+	}
+	return false;
+}
 
 bool CopressFileCheck(string s) {
 
@@ -219,7 +252,7 @@ void upload() {
 	}
 
 
-	if (del_path.length() > 5) {
+	if (del_path.length() > 5& del_Path_Compare(del_path)) {
 
 		vector<string> files4 = getFiles(del_path + "*");
 		iVector = files4.begin();	
