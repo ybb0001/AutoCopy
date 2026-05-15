@@ -10,7 +10,6 @@
 #include <fstream>
 #include <qdatetime.h>
 
-
 using namespace std;
 
 bool start = true;
@@ -121,6 +120,19 @@ bool del_Path_Compare(string file) {
 	return false;
 }
 
+void path_Delete(string path) {
+
+	vector<string> files = getFiles(path + "*");
+	vector<string> ::iterator iVector = files.begin();
+	while (iVector != files.end())
+	{
+		string s = path + *iVector;
+		DeleteFile(CA2CT(s.c_str()));
+		++iVector;
+	}
+
+}
+
 bool CopressFileCheck(string s) {
 
 	if (s[s.size() - 1] == 'r' || s[s.size() - 1] == 'R')
@@ -140,23 +152,74 @@ bool CopressFileCheck(string s) {
 }
 
 
-void upload() {
+void data_Copy(string src, string dst, string copy_set, string upper_path) {
 
-	string str = QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss").toStdString();
+	if (mode > 0 && src.length() > 5) {
 
-	get_Setting(setting);
-	vector<string> files1 = getFiles(src + "*");
-	vector<string> ::iterator iVector = files1.begin();
-
-	if (mode > 0&& src.length() > 5) {
+		vector<string> files1 = getFiles(src + "*");
+		vector<string> ::iterator iVector = files1.begin();
+		bool ok = false;
 		while (iVector != files1.end())
 		{
 			string s = src + *iVector;
 			string d = dst + *iVector;
 
-			if ((mode & 2)>0 || !File_Name_Compare(*iVector))
-				CopyFile(CA2CT(s.c_str()), CA2CT(d.c_str()), false);
+			if ((mode & 2) > 0 || !File_Name_Compare(*iVector)) {
 
+				ok=CopyFile(CA2CT(s.c_str()), CA2CT(d.c_str()), false);
+				if (!ok) {
+					ok = DeleteFile(CA2CT(d.c_str()));
+					ok = CopyFile(CA2CT(s.c_str()), CA2CT(d.c_str()), false);
+				}
+
+			}
+			++iVector;
+		}
+		string str = QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss").toStdString();
+		WritePrivateProfileString(TEXT("Copy_Setting"), TEXT("Last_Copy_Date"), CA2CT(str.c_str()), CA2CT(copy_set.c_str()));
+
+		if (upper_path.size() > 2 && (mode & 8) > 0) {
+			vector<string> files11 = getFiles(upper_path + "*");
+			iVector = files11.begin();
+			while (iVector != files11.end())
+			{
+				string s = upper_path + *iVector;
+				string d = dst + *iVector;
+
+				if (CopressFileCheck(s))
+					CopyFile(CA2CT(s.c_str()), CA2CT(d.c_str()), false);
+
+				++iVector;
+			}
+		}
+	}
+
+}
+
+
+void upload() {
+
+	string str = QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss").toStdString();
+
+	get_Setting(setting);
+
+	data_Copy(src, dst, setting, upper_src);
+	data_Copy(src2, dst2, setting2, upper_src2);
+	data_Copy(src3, dst3, setting3, upper_src3);
+
+	/*
+	if (mode > 0&& src.length() > 5) {
+	vector<string> files1 = getFiles(src + "*");
+	vector<string> ::iterator iVector = files1.begin();
+		while (iVector != files1.end())
+		{
+			string s = src + *iVector;
+			string d = dst + *iVector;
+
+			if ((mode & 2) > 0 || !File_Name_Compare(*iVector)) {
+
+				CopyFile(CA2CT(s.c_str()), CA2CT(d.c_str()), false);
+			}
 			++iVector;
 		}
 
@@ -250,18 +313,10 @@ void upload() {
 			}
 		}
 	}
-
+	*/
 
 	if (del_path.length() > 5& del_Path_Compare(del_path)) {
-
-		vector<string> files4 = getFiles(del_path + "*");
-		iVector = files4.begin();	
-		while (iVector != files4.end())
-		{
-			string s = del_path + *iVector;
-			DeleteFile(CA2CT(s.c_str()));
-			++iVector;
-		}	
+		path_Delete(del_path);
 	}
 
 }
@@ -312,7 +367,6 @@ int getLastPath(string s) {
 	}
 	return len+1;
 }
-
 
 AutoCopy::AutoCopy(QWidget *parent) :
 	QWidget(parent),

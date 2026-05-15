@@ -28,6 +28,16 @@
       <Extensions>moc;h;cpp</Extensions>
       <SourceControlFiles>False</SourceControlFiles>
     </Filter>
+    <Filter Include="Generated Files\Debug">
+      <UniqueIdentifier>{26a0f089-ee76-4b1b-896f-8bdbb74e6e16}</UniqueIdentifier>
+      <Extensions>cpp;moc</Extensions>
+      <SourceControlFiles>False</SourceControlFiles>
+    </Filter>
+    <Filter Include="Generated Files\Release">
+      <UniqueIdentifier>{5ab652d7-4cc1-4011-b389-e7a8eae1ee3c}</UniqueIdentifier>
+      <Extensions>cpp;moc</Extensions>
+      <SourceControlFiles>False</SourceControlFiles>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -36,30 +46,30 @@
     <ClCompile Include="AutoCopy.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_AutoCopy.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_AutoCopy.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\qrc_AutoCopy.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <QtMoc Include="AutoCopy.h">
+    <CustomBuild Include="AutoCopy.h">
       <Filter>Header Files</Filter>
-    </QtMoc>
-  </ItemGroup>
-  <ItemGroup>
-    <QtUic Include="AutoCopy.ui">
+    </CustomBuild>
+    <CustomBuild Include="AutoCopy.ui">
       <Filter>Form Files</Filter>
-    </QtUic>
-  </ItemGroup>
-  <ItemGroup>
-    <QtRcc Include="AutoCopy.qrc">
+    </CustomBuild>
+    <CustomBuild Include="AutoCopy.qrc">
       <Filter>Resource Files</Filter>
-    </QtRcc>
+    </CustomBuild>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GeneratedFiles\ui_AutoCopy.h">
-      <Filter>Header Files</Filter>
+      <Filter>Generated Files</Filter>
     </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <Image Include="icon.png">
-      <Filter>Resource Files</Filter>
-    </Image>
   </ItemGroup>
 </Project>

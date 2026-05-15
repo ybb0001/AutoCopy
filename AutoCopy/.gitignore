@@ -1,0 +1,9 @@
+
+*.tlog
+*.tlog
+*.obj
+*.log
+*.pdb
+*.filters
+*.vcxproj
+*.user
